@@ -1,0 +1,2 @@
+rootProject.name = 'oereb-test-suite'
+include('lib')

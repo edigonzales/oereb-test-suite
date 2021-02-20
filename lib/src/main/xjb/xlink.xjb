@@ -1,0 +1,15 @@
+
+<bindings xmlns="https://jakarta.ee/xml/ns/jaxb" version="3.0" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+	<bindings scd="x-schema::xlink">
+		<schemaBindings>
+			<package name="ch.ehi.oereb.schemas.xlink._1999"/>
+		</schemaBindings>
+		<bindings scd="/element::xlink:title">
+			<property name="xlink:title2" />
+		</bindings>
+	</bindings>
+
+</bindings>
+

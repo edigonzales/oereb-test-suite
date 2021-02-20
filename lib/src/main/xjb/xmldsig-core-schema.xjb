@@ -1,0 +1,11 @@
+<bindings xmlns="https://jakarta.ee/xml/ns/jaxb" version="3.0" 
+        xmlns:ds="http://www.w3.org/2000/09/xmldsig#" 
+  >
+ <bindings scd="x-schema::ds"> 
+   <schemaBindings>
+      <package name="ch.ehi.oereb.schemas.xmldsig._2000_09"/>
+    </schemaBindings>
+ </bindings>
+ 
+</bindings>
+

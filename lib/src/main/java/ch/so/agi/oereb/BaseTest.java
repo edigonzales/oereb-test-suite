@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+
 import org.apache.commons.compress.utils.IOUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.io.TempDir;
@@ -17,9 +18,13 @@ import org.slf4j.LoggerFactory;
 import ch.ehi.ili2db.base.Ili2db;
 import ch.ehi.ili2db.gui.Config;
 import ch.ehi.ili2h2gis.H2gisMain;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Unmarshaller;
 import net.lingala.zip4j.ZipFile;
 
 public class BaseTest {
+    static String OEREB_SERVICE_BASE_URL = "https://geo.so.ch/api/oereb/";
+    
     static String DB_FILE_NAME = "hoheitsgrenzen_annex";
     static String MUNICIPALITY_MODEL = "SO_Hoheitsgrenzen_Publikation_20170626";
     static String MUNICIPALITY_FILE_NAME = "ch.so.agi.hoheitsgrenzen.xtf";
@@ -33,9 +38,26 @@ public class BaseTest {
     static Logger log = LoggerFactory.getLogger(MunicipalityTest.class);
 
     static String dbUrl;
+    
+    static Unmarshaller unmarshaller;
 
     @TempDir
     static File tempDir;
+    
+    @BeforeAll
+    public static void createMarshaller() throws Exception {
+        JAXBContext jaxbContext = JAXBContext.newInstance( "ch.ehi.oereb.schemas.gml._3_2:"
+                + "ch.ehi.oereb.schemas.iso19139._2005.gmd:"
+                + "ch.ehi.oereb.schemas.iso19139._2005.gsr:"
+                + "ch.ehi.oereb.schemas.iso19139._2005.gss:"
+                + "ch.ehi.oereb.schemas.iso19139._2005.gts:"
+                + "ch.ehi.oereb.schemas.iso19139.gco:"
+                + "ch.ehi.oereb.schemas.oereb._1_0.extract:"
+                + "ch.ehi.oereb.schemas.oereb._1_0.extractdata:"
+                + "ch.ehi.oereb.schemas.xlink._1999:"
+                + "ch.ehi.oereb.schemas.xmldsig._2000_09" );
+        unmarshaller = jaxbContext.createUnmarshaller();
+    }
 
     @BeforeAll
     public static void setupDatabase() throws Exception {

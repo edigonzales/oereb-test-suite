@@ -4,19 +4,37 @@ plugins {
 
 apply from: "$rootDir/gradle/versioning.gradle"
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+sourceCompatibility = '15'
+targetCompatibility = '15'
+
+def generatedXjcSources = "$buildDir/xjc/java"
 
 sourceSets {
     test {
-        java.srcDir 'src/main/java'
-        resources.srcDir 'src/main/resources'
+        java {
+            srcDirs = ['src/main/java',"$generatedXjcSources"]
+        }
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
+    main {
+        java {
+            srcDirs = ['src/main/java',"$generatedXjcSources"]
+        }
+        resources {
+            srcDirs = ['src/main/resources']
+        }
     }
 }
 
 repositories {
     mavenCentral()
     maven { url "http://jars.interlis.ch/" }
+}
+
+configurations {
+    jaxb
 }
 
 dependencies {
@@ -33,9 +51,61 @@ dependencies {
     implementation 'org.orbisgis:h2gis:1.5.0'
     implementation 'ch.interlis:ili2h2gis:4.4.5'
     implementation 'ch.ehi:ehibasics:1.4.0'
-
+    
+    //implementation 'javax.xml.bind:jaxb-api:2.3.1'
+    //implementation 'com.sun.xml.bind:jaxb-core:2.3.0.1'
+    //implementation 'com.sun.xml.bind:jaxb-impl:2.3.2'
+    //implementation 'javax.activation:activation:1.1.1'
+ implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.0'
+ implementation group: 'org.glassfish.jaxb', name: 'jaxb-core', version: '3.0.0'
+ implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '3.0.0'
+ implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.0.0'
+ 
+    
+    jaxb (
+        'org.glassfish.jaxb:jaxb-xjc:3.0.0',
+        'jakarta.xml.bind:jakarta.xml.bind-api:3.0.0',
+        'org.glassfish.jaxb:jaxb-core:3.0.0',
+        'com.sun.xml.bind:jaxb-impl:3.0.0',
+        'jakarta.activation:jakarta.activation-api:2.0.0'
+        //'com.sun.xml.bind:jaxb-xjc:2.3.1',
+        //'javax.xml.bind:jaxb-api:2.3.1',
+        //'com.sun.xml.bind:jaxb-core:2.3.0.1',
+        //'com.sun.xml.bind:jaxb-impl:2.3.2',
+        //'javax.activation:activation:1.1.1'
+    )
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+task jaxb {
+    System.setProperty('javax.xml.accessExternalSchema', 'all')
+    inputs.files fileTree(dir: 'src/main/xsd', include: ['*.xsd'])
+    inputs.files fileTree(dir: 'src/main/xjb', include: ['*.xjb'])
+    outputs.files fileTree(dir: "$generatedXjcSources")
+    
+    doLast {
+        mkdir "$generatedXjcSources"
+
+        ant.taskdef(
+            name: 'xjc',
+            classname: 'com.sun.tools.xjc.XJCTask',
+            classpath: configurations.jaxb.asPath
+        )
+
+        ant.xjc(
+            destdir: "$generatedXjcSources",
+            language: 'XMLSCHEMA',
+            extension: true
+        ){
+            schema(dir: "src/main/xsd", includes: "OeREB/**/*.xsd,gml/3.2/gml.xsd")
+            binding(dir: "src/main/xjb", includes: "global.xjb,OeREB.xjb,xmldsig-core-schema.xjb,gml.xjb,iso-19139.xjb,xlink.xjb")
+            //arg(value: '-verbose')
+        }
+    }
+}
+compileJava.dependsOn jaxb
+
+

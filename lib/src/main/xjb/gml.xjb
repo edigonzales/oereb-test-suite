@@ -1,0 +1,84 @@
+
+<bindings xmlns="https://jakarta.ee/xml/ns/jaxb" xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" version="3.0" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns:gml="http://www.opengis.net/gml/3.2">
+	<bindings scd="x-schema::gml">
+		<schemaBindings>
+			<package name="ch.ehi.oereb.schemas.gml._3_2"/>
+			  <nameXmlTransform>
+				<typeName suffix="Type"/>
+			  </nameXmlTransform>
+		</schemaBindings>
+			<jaxb:bindings scd="/group::gml:PointGrid/element::gml:rows">
+				<jaxb:property name="Arows" />
+			</jaxb:bindings>
+			<jaxb:bindings scd="/element::gml:secondDefiningParameter">
+				<jaxb:class name="SecondDefiningParameterUpperCase" />
+			</jaxb:bindings>
+			<jaxb:bindings scd="/element::gml:ImageDatum">
+				<jaxb:class name="ImageDatumUpperCase" />
+			</jaxb:bindings>
+			<jaxb:bindings scd="/element::gml:GeodeticDatum">
+				<jaxb:class name="GeodeticDatumUpperCase" />
+			</jaxb:bindings>
+			<jaxb:bindings scd="/element::gml:TemporalDatum">
+				<jaxb:class name="TemporalDatumUpperCase" />
+			</jaxb:bindings>
+			<jaxb:bindings scd="/element::gml:Ellipsoid">
+				<jaxb:class name="EllipsoidUpperCase" />
+			</jaxb:bindings>
+			<jaxb:bindings scd="/element::gml:EngineeringDatum">
+				<jaxb:class name="EngineeringDatumUpperCase" />
+			</jaxb:bindings>
+			<jaxb:bindings scd="/element::gml:PrimeMeridian">
+				<jaxb:class name="PrimeMeridianUpperCase" />
+			</jaxb:bindings>
+			<jaxb:bindings scd="/element::gml:VerticalDatum">
+				<jaxb:class name="VerticalDatumUpperCase" />
+			</jaxb:bindings>
+		
+			<jaxb:bindings scd="/element::gml:UserDefinedCS">
+				<jaxb:class name="UserDefinedCSUpperCase" />
+			</jaxb:bindings>
+			<jaxb:bindings scd="/element::gml:CartesianCS">
+				<jaxb:class name="CartesianCSUpperCase" />
+			</jaxb:bindings>
+			<jaxb:bindings scd="/element::gml:SphericalCS">
+				<jaxb:class name="SphericalCSUpperCase" />
+			</jaxb:bindings>
+			<jaxb:bindings scd="/element::gml:PolarCS">
+				<jaxb:class name="PolarCSUpperCase" />
+			</jaxb:bindings>
+			<jaxb:bindings scd="/element::gml:LinearCS">
+				<jaxb:class name="LinearCSUpperCase" />
+			</jaxb:bindings>
+			<jaxb:bindings scd="/element::gml:VerticalCS">
+				<jaxb:class name="VerticalCSUpperCase" />
+			</jaxb:bindings>
+			<jaxb:bindings scd="/element::gml:CylindricalCS">
+				<jaxb:class name="CylindricalCSUpperCase" />
+			</jaxb:bindings>
+			<jaxb:bindings scd="/element::gml:EllipsoidalCS">
+				<jaxb:class name="EllipsoidalCSUpperCase" />
+			</jaxb:bindings>
+			<jaxb:bindings scd="/element::gml:AffineCS">
+				<jaxb:class name="AffineCSUpperCase" />
+			</jaxb:bindings>
+			<jaxb:bindings scd="/element::gml:TimeCS">
+				<jaxb:class name="TimeCSUpperCase" />
+			</jaxb:bindings>
+
+			<jaxb:bindings scd="/element::gml:Conversion">
+				<jaxb:class name="ConversionUpperCase" />
+			</jaxb:bindings>
+			<jaxb:bindings scd="/element::gml:ParameterValue">
+				<jaxb:class name="ParameterValueUpperCase" />
+			</jaxb:bindings>
+			<jaxb:bindings scd="/element::gml:OperationParameter">
+				<jaxb:class name="OperationParameterUpperCase" />
+			</jaxb:bindings>
+						
+	</bindings>
+
+</bindings>
+

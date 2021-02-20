@@ -1,0 +1,28 @@
+
+<bindings xmlns="https://jakarta.ee/xml/ns/jaxb" version="3.0" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+    xmlns:extract="http://schemas.geo.admin.ch/V_D/OeREB/1.0/Extract"
+    xmlns:data="http://schemas.geo.admin.ch/V_D/OeREB/1.0/ExtractData"
+    xmlns:versioning="http://schemas.geo.admin.ch/V_D/OeREB/1.0/Versioning"
+	>
+	<bindings scd="x-schema::extract">
+		<schemaBindings>
+			<package name="ch.ehi.oereb.schemas.oereb._1_0.extract"/>
+		</schemaBindings>
+	</bindings>
+	<bindings scd="x-schema::data">
+		<schemaBindings>
+			<package name="ch.ehi.oereb.schemas.oereb._1_0.extractdata"/>
+			  <nameXmlTransform>
+				<typeName suffix="Type"/>
+			  </nameXmlTransform>
+		</schemaBindings>
+	</bindings>
+	<bindings scd="x-schema::versioning">
+		<schemaBindings>
+			<package name="ch.ehi.oereb.schemas.oereb._1_0.versioning"/>
+		</schemaBindings>
+	</bindings>
+
+</bindings>
+

@@ -27,19 +27,33 @@ public class MunicipalityTest extends BaseTest {
 
     @Test
     public void annexMatchesMunicipalities() throws Exception {
-        try (Connection conn = DriverManager.getConnection(dbUrl); Statement stmt = conn.createStatement()) {
-            ResultSet rs = stmt.executeQuery(
-                    "SELECT \n" +
-                            "ANNEX.T_ID, \n" +
-                            "ANNEX.MUNICIPALITY \n" +
-                            "FROM \n" +
-                            ANNEX_MUNICIPALITYWITHPLRC + " AS ANNEX \n" +
-                            "LEFT JOIN "+HOHEITSGRENZEN_GEMEINDEGRENZE+" AS GEMEINDE \n" +
-                            "ON GEMEINDE.BFS_GEMEINDENUMMER = ANNEX.MUNICIPALITY \n" +
-                            "WHERE \n" +
-                            "GEMEINDE.BFS_GEMEINDENUMMER IS NULL\n" +
-                            ";"
-            );
+        try (var conn = DriverManager.getConnection(dbUrl); var stmt = conn.createStatement()) {
+//            ResultSet rs = stmt.executeQuery(
+//                    "SELECT \n" +
+//                            "ANNEX.T_ID, \n" +
+//                            "ANNEX.MUNICIPALITY \n" +
+//                            "FROM \n" +
+//                            ANNEX_MUNICIPALITYWITHPLRC + " AS ANNEX \n" +
+//                            "LEFT JOIN "+HOHEITSGRENZEN_GEMEINDEGRENZE+" AS GEMEINDE \n" +
+//                            "ON GEMEINDE.BFS_GEMEINDENUMMER = ANNEX.MUNICIPALITY \n" +
+//                            "WHERE \n" +
+//                            "GEMEINDE.BFS_GEMEINDENUMMER IS NULL\n" +
+//                            ";"
+//            );
+            
+            var sql = """
+            SELECT 
+                annex.T_ID,
+                annex.MUNICIPALITY
+            FROM 
+                ANNEX_MUNICIPALITYWITHPLRC AS ANNEX 
+                LEFT JOIN HOHEITSGRENZEN_GEMEINDEGRENZE AS GEMEINDE
+                ON GEMEINDE.BFS_GEMEINDENUMMER = ANNEX.MUNICIPALITY 
+            WHERE 
+                gemeinde.BFS_GEMEINDENUMMER IS NULL
+            """;
+            
+            var rs = stmt.executeQuery(sql);
 
             assertFalse(rs.next(), "Annex data has superfluous municipalities.");
 
@@ -50,8 +64,8 @@ public class MunicipalityTest extends BaseTest {
 
     @Test
     public void municipalitiesMatchesAnnex() throws Exception {
-        try (Connection conn = DriverManager.getConnection(dbUrl); Statement stmt = conn.createStatement()) {
-            ResultSet rs = stmt.executeQuery(
+        try (var conn = DriverManager.getConnection(dbUrl); var stmt = conn.createStatement()) {
+            var rs = stmt.executeQuery(
                     "SELECT \n" +
                             "GEMEINDE.T_ID, \n" +
                             "GEMEINDE.BFS_GEMEINDENUMMER \n" +

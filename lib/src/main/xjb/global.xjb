@@ -1,0 +1,8 @@
+<bindings xmlns="https://jakarta.ee/xml/ns/jaxb" version="3.0" 
+  >
+ <globalBindings  generateElementClass="true">
+    
+ </globalBindings>
+
+</bindings>
+

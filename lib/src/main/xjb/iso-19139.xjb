@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bindings xmlns="https://jakarta.ee/xml/ns/jaxb" version="3.0">
+	<bindings scd="x-schema::tns" xmlns:tns="http://www.isotc211.org/2005/gts">
+		<schemaBindings>
+			<package name="ch.ehi.oereb.schemas.iso19139._2005.gts"/>
+		</schemaBindings>
+	</bindings>
+	<bindings scd="x-schema::tns" xmlns:tns="http://www.isotc211.org/2005/gsr">
+		<schemaBindings>
+			<package name="ch.ehi.oereb.schemas.iso19139._2005.gsr"/>
+		</schemaBindings>
+	</bindings>
+	<bindings scd="x-schema::tns" xmlns:tns="http://www.isotc211.org/2005/gss">
+		<schemaBindings>
+			<package name="ch.ehi.oereb.schemas.iso19139._2005.gss"/>
+		</schemaBindings>
+	</bindings>
+	<bindings scd="x-schema::tns" xmlns:tns="http://www.isotc211.org/2005/gco">
+		<schemaBindings>
+			<package name="ch.ehi.oereb.schemas.iso19139.gco"/>
+		</schemaBindings>
+	</bindings>
+	<bindings scd="x-schema::tns" xmlns:tns="http://www.isotc211.org/2005/gmd">
+		<schemaBindings>
+			<package name="ch.ehi.oereb.schemas.iso19139._2005.gmd"/>
+		</schemaBindings>
+	</bindings>
+</bindings>

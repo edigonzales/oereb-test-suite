@@ -25,6 +25,8 @@ jobs:
         #if: ${{ github.ref == 'refs/heads/master' }}  
         env:
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
+      - name: Install dependencies for deploy
+        run: yarn
       - name: Deploy
         uses: reggionick/s3-deploy@v3
         if: ${{ failure() }}

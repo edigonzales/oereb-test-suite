@@ -2,22 +2,8 @@ package ch.so.agi.oereb;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import ch.ehi.ili2db.base.Ili2db;
-import ch.ehi.ili2db.gui.Config;
-import ch.ehi.ili2h2gis.H2gisMain;
-import net.lingala.zip4j.ZipFile;
-import org.apache.commons.compress.utils.IOUtils;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.sql.*;
 
 import org.slf4j.Logger;

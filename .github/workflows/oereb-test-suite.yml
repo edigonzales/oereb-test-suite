@@ -1,6 +1,10 @@
 name: oereb-test-suite
 
-on: [push]
+on: 
+  push:
+  schedule:
+    - cron: "00 01,13 * * *"
+
 
 jobs:
   build:

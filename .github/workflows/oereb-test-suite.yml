@@ -25,6 +25,10 @@ jobs:
         #if: ${{ github.ref == 'refs/heads/master' }}  
         env:
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
+      - uses: actions/setup-node@v2
+        if: ${{ failure() }}
+        with:
+          node-version: '12'
       - name: Install dependencies for deploy
         if: ${{ failure() }}
         run: yarn

@@ -27,11 +27,11 @@ jobs:
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
       - name: Deploy
         uses: reggionick/s3-deploy@v3
+        if: ${{ failure() }}
         with:
           folder: lib/build/test/
           bucket: ${{ secrets.S3_BUCKET }}
           bucket-region: ${{ secrets.S3_BUCKET_REGION }}
-          invalidation: /
           delete-removed: true
           no-cache: true
           private: false

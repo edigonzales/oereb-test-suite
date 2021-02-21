@@ -2,13 +2,19 @@ package ch.so.agi.oereb;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
-import java.io.InputStream;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
@@ -16,81 +22,153 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import org.locationtech.jts.geom.Point;
+import org.xml.sax.SAXException;
 
 import ch.ehi.oereb.schemas.oereb._1_0.extract.GetEGRIDResponse;
-import ch.ehi.oereb.schemas.oereb._1_0.extract.GetEGRIDResponseType;
-import jakarta.xml.bind.JAXBElement;
+import ch.ehi.oereb.schemas.oereb._1_0.extract.GetExtractByIdResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExtractTest extends BaseTest {
+    Logger logger = LoggerFactory.getLogger(ExtractTest.class);
 
-    @Order(1)
+    private static SchemaFactory factory;
+    private static Schema schema;
+    private static Validator validator;
+    
+    @BeforeAll
+    public static void setupValidators() throws Exception {
+        factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        schema = factory.newSchema(new File("src/main/xsd/OeREB/1.0/Extract.xsd"));
+        validator = schema.newValidator();
+    }
+    
     @ParameterizedTest(name = "#{index} - Test with municipality : {0}")
     @MethodSource("municipalitiesWithPLR")
-    public void xmlGetEgrid(Map.Entry<String, Point> arg) throws Exception {
+    public void extract_Ok(Map.Entry<String, Point> arg) throws Exception {
         assertNotNull(arg);
         
         var fosnr = arg.getKey();
         var point = arg.getValue();
         
-        var url = new URL(OEREB_SERVICE_BASE_URL + "getegrid/xml/?XY="+point.getX()+","+point.getY());
-        var connection = (HttpURLConnection) url.openConnection();
-        connection.setConnectTimeout(4000);
-        connection.setReadTimeout(20000);
-        connection.setRequestMethod("GET");
+        assertNotNull(fosnr, "FOS nr must not be null.");
+        assertNotNull(point, "Coordinate must not be null.");
+        
+        var egridUrl = OEREB_SERVICE_BASE_URL + "getegrid/xml/?XY="+point.getX()+","+point.getY();
+        var egridClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(2))
+                .build();
+        var egridRequest = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(egridUrl))
+                .timeout(Duration.ofSeconds(30))
+                .header("Accept", "application/xml")
+                .build();
 
-        var getEgridFile = Paths.get(tempDir.getAbsolutePath(), fosnr+"_"+String.valueOf(point.getX()) + "_" +String.valueOf(point.getY())+ ".xml").toFile();
-        var getEgridInputStream = connection.getInputStream();
-        Files.copy(getEgridInputStream, getEgridFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        getEgridInputStream.close();
-        
-        var content = new String(Files.readAllBytes(Paths.get(getEgridFile.getAbsolutePath())));
-        System.out.println(content);
-        
+        var getEgridPath = Paths.get(tempDir.getAbsolutePath(), fosnr+"_"+String.valueOf(point.getX()) + "_" +String.valueOf(point.getY())+ ".xml");
+        var egridResponse = egridClient.send(egridRequest, BodyHandlers.ofFile(getEgridPath));
 
+        assertEquals(200, egridResponse.statusCode(), "Wrong GetEgrid response code.");
         
-        var xmlSource = new StreamSource(getEgridFile);
+        var content = new String(Files.readAllBytes(getEgridPath));
+        
+        var xsdCompliant = true;
+        try {
+            validator.validate(new StreamSource(getEgridPath.toFile()));   
+        } catch (SAXException e) {
+            e.printStackTrace();
+            xsdCompliant = false;
+        }
+        
+        assertTrue(xsdCompliant, "GetEgrid response is not xsd compliant: \n " + content);
+
+        var xmlSource = new StreamSource(getEgridPath.toFile());
         var obj = (GetEGRIDResponse) unmarshaller.unmarshal(xmlSource);
         var egridResponseType = obj.getValue();
         var egridXmlList = egridResponseType.getEgridAndNumberAndIdentDN();
 
-        for (int i=0; i<egridXmlList.size(); i++) {
+        var egrids = new ArrayList<String>();
+        for (int i=0; i<egridXmlList.size(); i+=3) {
+            var egrid = egridXmlList.get(i).getValue();
+            var identdn = egridXmlList.get(i+2).getValue();
             
-            System.out.println(egridXmlList.get(i).getValue());
+            assertEquals(14, egrid.length(), "Not valid egrid.");
+            assertEquals(12, identdn.length(), "Not valid identdn.");
+            
+            egrids.add(egrid);
         }
-
-//        for (int i=0; i<egridXmlList.size(); i=i+3) {
-//            Egrid egridObj = new Egrid();
-//            egridObj.setEgrid(egridXmlList.get(i).getValue());
-//            egridObj.setNumber(egridXmlList.get(i+1).getValue());
-//            egridObj.setIdentDN(egridXmlList.get(i+2).getValue());
-//            egridObj.setOerebServiceBaseUrl(oerebBaseUrl);
-//            logger.debug("E-GRID: " + egridObj.getEgrid());
-//            egridList.add(egridObj);
-//        }
-
         
+        for (var egrid : egrids) {
+            var extractUrl = OEREB_SERVICE_BASE_URL + "extract/reduced/xml/geometry/"+egrid;
+            
+            var extractClient = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(2))
+                    .build();
+            var extractRequest = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(URI.create(extractUrl))
+                    .timeout(Duration.ofSeconds(30))
+                    .header("Accept", "application/xml")
+                    .build();
+
+            var getExtractPath = Paths.get(tempDir.getAbsolutePath(), fosnr+"_"+egrid+ ".xml");
+            var extractResponse = extractClient.send(extractRequest, BodyHandlers.ofFile(getExtractPath));
+
+            assertEquals(200, extractResponse.statusCode(), "Wrong Extract response status code for " + extractUrl.toString());
+            
+            var extractXsdCompliant = true;
+            try {
+                validator.validate(new StreamSource(getExtractPath.toFile()));   
+            } catch (SAXException e) {
+                e.printStackTrace();
+                extractXsdCompliant = false;
+            }
+
+            assertTrue(extractXsdCompliant, "Extract response is not xsd compliant.");
+            
+            var extractXmlSource = new StreamSource(getExtractPath.toFile());
+            var extractObj = (GetExtractByIdResponse) unmarshaller.unmarshal(extractXmlSource);
+            var xmlExtract = extractObj.getValue().getExtract().getValue();
+            
+            var concernedThemes = xmlExtract.getConcernedTheme();
+            if (concernedThemes.size() > 0) {
+                xmlExtract.getRealEstate().getRestrictionOnLandownership().stream().forEach(r -> {
+                    var wmsUrl = r.getMap().getReferenceWMS();
+                    var wmsRequest = HttpRequest.newBuilder()
+                            .GET()
+                            .uri(URI.create(wmsUrl))
+                            .timeout(Duration.ofSeconds(30))
+                            .build();
+                    
+                    try {
+                        log.info(wmsUrl);
+                        var wmsResponse = extractClient.send(wmsRequest, BodyHandlers.discarding());
+                        assertEquals(200, wmsResponse.statusCode(), "Wrong response status code for WMS request.");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+            }   
+        }
     }
-    
-    @Order(2)
-    @Test
-    public void fubar() {
-        System.out.println("fubar");
-    }
-    
     
     private static Stream<Map.Entry<String, Point>> municipalitiesWithPLR() throws Exception {
         Map<String, Point> municipalityMap = new HashMap<String, Point>();
@@ -104,10 +182,7 @@ public class ExtractTest extends BaseTest {
                     + "    ON plr.MUNICIPALITY = gemeinde.BFS_GEMEINDENUMMER ");
             while(rs.next()) {
                 municipalityMap.put(rs.getString(1), (Point) rs.getObject(2));
-                
-                break;
-                
-                
+                 //break;
             }            
             Stream<Map.Entry<String, Point>> stream = mapToStream(municipalityMap);
             return stream;

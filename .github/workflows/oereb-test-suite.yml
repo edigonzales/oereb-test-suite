@@ -1,0 +1,24 @@
+name: oereb-test-suite
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Set up JDK 15
+        uses: actions/setup-java@v1
+        with:
+          java-version: 15
+      - name: Build with Gradle
+        run: ./gradlew clean lib:test
+        #if: ${{ github.ref == 'refs/heads/master' }}  
+        env:
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}

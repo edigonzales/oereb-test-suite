@@ -21,7 +21,7 @@ jobs:
         with:
           java-version: 15
       - name: Build with Gradle
-        run: ./gradlew clean lib:test --tests ch.so.agi.oereb.MunicipalityTest
+        run: ./gradlew clean lib:test 
         #if: ${{ github.ref == 'refs/heads/master' }}  
         env:
           GITHUB_RUN_NUMBER: ${{ github.run_number }}

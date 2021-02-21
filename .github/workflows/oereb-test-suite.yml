@@ -21,15 +21,16 @@ jobs:
         with:
           java-version: 15
       - name: Build with Gradle
-        run: ./gradlew clean lib:test
+        run: ./gradlew clean lib:test --tests ch.so.agi.oereb.MunicipalityTest  -x lib:jaxb
         #if: ${{ github.ref == 'refs/heads/master' }}  
         env:
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
       - name: Install dependencies for deploy
+        if: ${{ failure() }}
         run: yarn
       - name: Deploy
         uses: reggionick/s3-deploy@v3
-        if: ${{ failure() }}
+        #if: ${{ failure() }}
         with:
           folder: lib/build/test/
           bucket: ${{ secrets.S3_BUCKET }}

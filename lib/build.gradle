@@ -105,4 +105,17 @@ task jaxb {
 }
 compileJava.dependsOn jaxb
 
+javadoc {
+    //exclude "**/schemas/**"
+    
+    source sourceSets.test.allJava
+    classpath = configurations.compileClasspath
+    classpath += configurations.testCompileClasspath
+    options.tags = [ "Description" ]
+    options {
+      encoding "UTF-8"
+      docEncoding "UTF-8"
+      charSet "UTF-8"
+    }
+}
 

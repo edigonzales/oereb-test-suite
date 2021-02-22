@@ -11,6 +11,14 @@ import org.slf4j.LoggerFactory;
 
 public class MunicipalityTest extends BaseTest {
 
+    /**
+     * 
+     *  @Description Der Test vergleicht die Gemeinden aus dem Annex-Modell mit den Gemeinden aus dem offiziellen 
+     *  Gemeindegrenzdatensatz des Kantons. Der Test findet Gemeinden, die im Annex-Modell vorhanden sind, im 
+     *  Gemeindegrenzdatensatz jedoch nicht.
+     *  
+     *  @throws Exception
+     */
     @Test
     public void annexMatchesMunicipalities() throws Exception {
         try (var conn = DriverManager.getConnection(dbUrl); var stmt = conn.createStatement()) {
@@ -48,6 +56,14 @@ public class MunicipalityTest extends BaseTest {
         }
     }
 
+    /**
+     * 
+     *  @Description Der Test vergleicht die Gemeinden aus dem offiziellen Gemeindegrenzdatensatz mit den
+     *  Gemeinden aus dem  dem Annex-Modell. Der Test findet Gemeinden, die im Gemeindegrenzdatensatz
+     *  vorhanden sind, im Annex-Modell jedoch nicht.
+     *  
+     *  @throws Exception
+     */
     @Test
     public void municipalitiesMatchesAnnex() throws Exception {
         try (var conn = DriverManager.getConnection(dbUrl); var stmt = conn.createStatement()) {

@@ -61,6 +61,26 @@ public class ExtractTest extends BaseTest {
         validator = schema.newValidator();
     }
     
+    /**
+     * 
+     *  @Description Der Test versucht mit einer beliebigen Koordinate innerhalb der Gemeinde einen 
+     *  XML-Auszug anzufordern. Geprüft wird folgendes: <br><br>
+     *  
+     *  - Koordinate darf nicht NULL sein. Falls die Koordinate NULL ist, stimmen Annex-Modell und 
+     *  Gemeindegrenzdatensatz nicht überein.
+     *  <br>
+     *  - Mit der Koordinate wird ein GetEgrid-Request ausgeführt. Der zurückgelieferte Status-Code
+     *  muss 200 sein. Das XML wird auf Schemakonformität geprüft.
+     *  <br>
+     *  - Mit dem so eruierten E-GRID wird ein (reduced) Extract-Request gemacht. Respektive mehrere, falls 
+     *  mehrere Grundstücke betroffen sind. Der zurückgelieferte Status-Code muss 200 sein und das
+     *  XML wird auf Schemakonformität geprüft.
+     *  <br>
+     *  - Falls im Auszug Eigentumsbeschränkungen vorhanden sind, müssen auch WMS-Requests vorhanden sind. 
+     *  Es wird geprüft, ob die WMS-Requests den Status-Code 200 zurücklieferen.
+     *    
+     *  @throws Exception
+     */
     @ParameterizedTest(name = "#{index} - Test with municipality : {0}")
     @MethodSource("municipalitiesWithPLR")
     public void extract_Ok(Map.Entry<String, Point> arg) throws Exception {

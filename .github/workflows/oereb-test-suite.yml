@@ -25,12 +25,13 @@ jobs:
         with:
           java-version: 15
       - name: Build with Gradle
-        run: ./gradlew clean lib:test 
+        run: ./gradlew clean lib:test lib:javadoc --continue
         #if: ${{ github.ref == 'refs/heads/master' }}  
         env:
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
       - uses: actions/upload-artifact@v2
         if: ${{ failure() }}
         with:
-          name: reports
-          path: lib/build/reports/tests/ # or path/to/artifact
+          name: output
+          path: lib/build/reports/tests/
+          path: lib/build/docs/

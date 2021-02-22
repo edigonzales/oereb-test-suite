@@ -33,5 +33,6 @@ jobs:
         if: ${{ failure() }}
         with:
           name: output
-          path: lib/build/reports/tests/
-          path: lib/build/docs/
+          path: | 
+            lib/build/reports/tests/
+            lib/build/docs/

@@ -32,7 +32,10 @@ jobs:
       - uses: actions/upload-artifact@v2
         if: ${{ failure() }}
         with:
-          name: output
-          path: | 
-            lib/build/reports/tests/
-            lib/build/docs/
+          name: reports
+          path: lib/build/reports/tests/
+      - uses: actions/upload-artifact@v2
+        if: ${{ failure() }}
+        with:
+          name: javadoc
+          path: lib/build/docs/
